@@ -38,7 +38,7 @@ def remove_outliers(df, column, center='median', std=3, max_value=None):
 
     else:
         if not center in ['median', 'mean', 'avg']:
-            print('Center options are median or mean!')
+            print('Center options are median or mean.')
             return None
 
         if center == 'median':
