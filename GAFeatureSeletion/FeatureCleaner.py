@@ -32,26 +32,36 @@ def get_invariant_features(df, verbose=False):
     return drop_columns
 
 
-def remove_outliers(df, column, center='median', std=3, max_value=None):
+def remove_outliers(df,
+                    column,
+                    percentile=0.01,
+                    stdev=None,
+                    center="mean",
+                    max_value=None):
+
     if max_value is not None:
         df = df[df[column] < max_value]
 
-    else:
-        if not center in ['median', 'mean', 'avg']:
-            print('Center options are median or mean.')
-            return None
+    if center not in ['median', 'mean']:
+        print('Center options are median or mean.')
+        return None
 
-        if center == 'median':
-            mu = df[column].median()
-        else:
+    if percentile is not None:
+        print("Using percentile.")
+        lower = df[column].quantile(percentile)
+        upper = df[column].quantile(1 - percentile)
+
+    if stdev is not None:
+        if center == "mean":
             mu = df[column].mean()
+        else:
+            mu = df[column].median()
 
         std_sample = df[column].std()
+        upper = mu + stdev * std_sample
+        lower = mu - stdev * std_sample
 
-        upper = mu + std*std_sample
-        lower = mu - std*std_sample
-
-        df = df[df[column].between(lower, upper)]
+    df = df[df[column].between(lower, upper)]
 
     return df
 
